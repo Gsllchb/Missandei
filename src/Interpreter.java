@@ -23,20 +23,20 @@ import java.util.Scanner;
 import java.util.Stack;
 
 final public class Interpreter {
-	final static int defaultLength = 1024;
-	
+	final static String VERSION = "0.0";
+
     public static void main(String[] args) {
 		if (args.length <= 0 || args.length > 2) {
 			System.out.println("Invalid argument");
 			return;
 		}
-		int length = defaultLength;
+		int tapeLength = DEFAULT_TAPE_LENGTH;
 		if (args.length == 2) {
-			length = Integer.valueOf(args[1]);
+			tapeLength = Integer.valueOf(args[1]);
 		}
 		
-		char[] tape = new char[length];
-		int head = length / 2;
+		char[] tape = new char[tapeLength];
+		int head = tapeLength / 2;
 		StringReader input = null; 
 		Stack<Integer> leftBracket = new Stack<Integer>();
 		
@@ -49,7 +49,7 @@ final public class Interpreter {
 			e.printStackTrace();
 		}
 		
-        try (Scanner in = new Scanner(new BufferedReader(new InputStreamReader(System.in)))) {
+        try (Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(System.in)))) {
 			for (int i = 0; i < program.length(); ++i) {
 				assert head >= 0 && head < tape.length;
 				switch (program.charAt(i)) {
@@ -75,7 +75,7 @@ final public class Interpreter {
 					break;
 				case ',':
 					if (input == null || !input.ready()) {
-						input = new StringReader(in.nextLine());
+						input = new StringReader(scanner.nextLine());
 					}
 					tape[head] = (char) input.read();
 					break;
@@ -100,16 +100,18 @@ final public class Interpreter {
 		}
     }
 	
+    final static int DEFAULT_TAPE_LENGTH = 1024;
+    
 	static char[] resize(final char[] source, final int head) {
 		assert head < 0 || head >= source.length;
 		final int length = source.length;
-		char[] arr = new char[length * 2];
+		char[] array = new char[length * 2];
 		if (head < 0) {
-			System.arraycopy(source, 0, arr, length, length);
+			System.arraycopy(source, 0, array, length, length);
 		} else {
-			System.arraycopy(source, 0, arr, 0, length);
+			System.arraycopy(source, 0, array, 0, length);
 		}
-		return arr;
+		return array;
 	}
 	 
 	static int matchedRightBracket(final CharSequence cs, final int begin) {
