@@ -37,7 +37,7 @@ final public class Interpreter {
 		
 		char[] tape = new char[tapeLength];
 		int head = tapeLength / 2;
-		StringReader input = new StringReader(""); 
+		StringReader input = null; 
 		Stack<Integer> leftBracket = new Stack<Integer>();
 		
 		StringBuilder program = new StringBuilder();
@@ -74,7 +74,7 @@ final public class Interpreter {
 					System.out.print(tape[head]);
 					break;
 				case ',':
-					if (!input.ready()) {
+					if (input == null || !input.ready()) {
 						input = new StringReader(scanner.nextLine());
 					}
 					tape[head] = (char) input.read();
