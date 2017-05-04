@@ -27,7 +27,7 @@ final public class Interpreter {
 
     public static void main(String[] args) {
 		if (args.length <= 0 || args.length > 2) {
-			System.out.println("Invalid argument");
+			introduce();
 			return;
 		}
 		int tapeLength = DEFAULT_TAPE_LENGTH;
@@ -43,10 +43,11 @@ final public class Interpreter {
 		StringBuilder program = new StringBuilder();
 		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(args[0]))) {
 			while (bufferedReader.ready()) {
-				program.append(bufferedReader.readLine());
+				program.append(bufferedReader.readLine()).append("\n");
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.print(e);
+			System.exit(-1);
 		}
 		
         try (Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(System.in)))) {
@@ -101,6 +102,15 @@ final public class Interpreter {
     }
 	
     final static int DEFAULT_TAPE_LENGTH = 1024;
+    
+    static void introduce() {
+    	System.out.print("Missandei " + VERSION +" Copyright (C) 2017 Gsllchb\n"
+    			+ "A simple JAVA interpreter of Brainfuck.\n"
+    			+ "Usage:\n"
+    			+ "\tjava [-options] -jar Missandei.jar scriptFile [initialTapeLength]\n"
+    			+ "More information:\n"
+    			+ "\thttps://github.com/Gsllchb/Missandei");
+    }
     
 	static char[] resize(final char[] source, final int head) {
 		assert head < 0 || head >= source.length;
