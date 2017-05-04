@@ -37,13 +37,13 @@ final public class Interpreter {
 		
 		char[] tape = new char[tapeLength];
 		int head = tapeLength / 2;
-		StringReader input = null; 
+		StringReader input = new StringReader(""); 
 		Stack<Integer> leftBracket = new Stack<Integer>();
 		
 		StringBuilder program = new StringBuilder();
-		try (BufferedReader br = new BufferedReader(new FileReader(args[0]))) {
-			while (br.ready()) {
-				program.append(br.readLine());
+		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(args[0]))) {
+			while (bufferedReader.ready()) {
+				program.append(bufferedReader.readLine());
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -74,7 +74,7 @@ final public class Interpreter {
 					System.out.print(tape[head]);
 					break;
 				case ',':
-					if (input == null || !input.ready()) {
+					if (!input.ready()) {
 						input = new StringReader(scanner.nextLine());
 					}
 					tape[head] = (char) input.read();
@@ -114,15 +114,15 @@ final public class Interpreter {
 		return array;
 	}
 	 
-	static int matchedRightBracket(final CharSequence cs, final int begin) {
+	static int matchedRightBracket(final CharSequence charSequence, final int leftBracketIndex) {
 		int flag = 1;
 		int i;
-		for (i = begin + 1; flag > 0; ++i) {
-			if (cs.charAt(i) == '[') {
+		for (i = leftBracketIndex + 1; flag > 0; ++i) {
+			if (charSequence.charAt(i) == '[') {
 				++flag;
 				continue;
 			}
-			if (cs.charAt(i) == ']') {
+			if (charSequence.charAt(i) == ']') {
 				--flag;
 			}
 		}
