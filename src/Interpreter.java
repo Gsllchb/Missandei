@@ -15,6 +15,7 @@
 //along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -32,7 +33,12 @@ final public class Interpreter {
 		}
 		int tapeLength = DEFAULT_TAPE_LENGTH;
 		if (args.length == 2) {
-			tapeLength = Integer.valueOf(args[1]);
+			try {
+				tapeLength = Integer.parseUnsignedInt(args[1]);
+			} catch (NumberFormatException e) {
+				System.out.println("Missandei: The initial length of the tape should be a postive integer");
+				System.exit(-1);
+			}
 		}
 		
 		char[] tape = new char[tapeLength];
@@ -45,9 +51,11 @@ final public class Interpreter {
 			while (bufferedReader.ready()) {
 				program.append(bufferedReader.readLine()).append("\n");
 			}
-		} catch (IOException e) {
-			System.out.print(e);
+		} catch (FileNotFoundException e) {
+			System.out.println("Missandei: can't open file '" + args[0] + "': No such file");
 			System.exit(-1);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		
         try (Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(System.in)))) {
