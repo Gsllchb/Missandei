@@ -24,13 +24,15 @@ import java.util.Scanner;
 import java.util.Stack;
 
 final public class Interpreter {
-	final static String VERSION = "0.0";
+	final static String VERSION = "0.1";
+    final static int DEFAULT_TAPE_LENGTH = 1024;
 
     public static void main(String[] args) {
 		if (args.length <= 0 || args.length > 2) {
 			introduce();
 			return;
 		}
+		final String scriptFile = args[0];
 		int tapeLength = DEFAULT_TAPE_LENGTH;
 		if (args.length == 2) {
 			try {
@@ -47,12 +49,12 @@ final public class Interpreter {
 		Stack<Integer> leftBracket = new Stack<Integer>();
 		
 		StringBuilder program = new StringBuilder();
-		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(args[0]))) {
+		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(scriptFile))) {
 			while (bufferedReader.ready()) {
 				program.append(bufferedReader.readLine()).append("\n");
 			}
 		} catch (FileNotFoundException e) {
-			System.out.println("Missandei: can't open file '" + args[0] + "': No such file");
+			System.out.println("Missandei: can't open file '" + scriptFile + "': No such file");
 			System.exit(-1);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -108,8 +110,6 @@ final public class Interpreter {
 			e.printStackTrace();
 		}
     }
-	
-    final static int DEFAULT_TAPE_LENGTH = 1024;
     
     static void introduce() {
     	System.out.print("Missandei " + VERSION +" Copyright (C) 2017 Gsllchb\n"
@@ -132,15 +132,15 @@ final public class Interpreter {
 		return array;
 	}
 	 
-	static int matchedRightBracket(final CharSequence charSequence, final int leftBracketIndex) {
+	static int matchedRightBracket(final CharSequence sequence, final int leftBracketIndex) {
 		int flag = 1;
 		int i;
 		for (i = leftBracketIndex + 1; flag > 0; ++i) {
-			if (charSequence.charAt(i) == '[') {
+			if (sequence.charAt(i) == '[') {
 				++flag;
 				continue;
 			}
-			if (charSequence.charAt(i) == ']') {
+			if (sequence.charAt(i) == ']') {
 				--flag;
 			}
 		}
