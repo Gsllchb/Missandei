@@ -15,6 +15,7 @@
 //along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,33 +24,43 @@ import java.util.Scanner;
 import java.util.Stack;
 
 final public class Interpreter {
-	final static int defaultLength = 1024;
-	
+	final static String VERSION = "0.1";
+    final static int DEFAULT_TAPE_LENGTH = 1024;
+
     public static void main(String[] args) {
 		if (args.length <= 0 || args.length > 2) {
-			System.out.println("Invalid argument");
+			introduce();
 			return;
 		}
-		int length = defaultLength;
+		final String scriptFile = args[0];
+		int tapeLength = DEFAULT_TAPE_LENGTH;
 		if (args.length == 2) {
-			length = Integer.valueOf(args[1]);
+			try {
+				tapeLength = Integer.parseUnsignedInt(args[1]);
+			} catch (NumberFormatException e) {
+				System.out.println("Missandei: The initial length of the tape should be a postive integer");
+				System.exit(-1);
+			}
 		}
 		
-		char[] tape = new char[length];
-		int head = length / 2;
+		char[] tape = new char[tapeLength];
+		int head = tapeLength / 2;
 		StringReader input = null; 
 		Stack<Integer> leftBracket = new Stack<Integer>();
 		
 		StringBuilder program = new StringBuilder();
-		try (BufferedReader br = new BufferedReader(new FileReader(args[0]))) {
-			while (br.ready()) {
-				program.append(br.readLine());
+		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(scriptFile))) {
+			while (bufferedReader.ready()) {
+				program.append(bufferedReader.readLine()).append("\n");
 			}
+		} catch (FileNotFoundException e) {
+			System.out.println("Missandei: can't open file '" + scriptFile + "': No such file");
+			System.exit(-1);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-        try (Scanner in = new Scanner(new BufferedReader(new InputStreamReader(System.in)))) {
+        try (Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(System.in)))) {
 			for (int i = 0; i < program.length(); ++i) {
 				assert head >= 0 && head < tape.length;
 				switch (program.charAt(i)) {
@@ -75,7 +86,7 @@ final public class Interpreter {
 					break;
 				case ',':
 					if (input == null || !input.ready()) {
-						input = new StringReader(in.nextLine());
+						input = new StringReader(scanner.nextLine());
 					}
 					tape[head] = (char) input.read();
 					break;
@@ -99,28 +110,37 @@ final public class Interpreter {
 			e.printStackTrace();
 		}
     }
-	
+    
+    static void introduce() {
+    	System.out.print("Missandei " + VERSION +" Copyright (C) 2017 Gsllchb\n"
+    			+ "A simple JAVA interpreter of Brainfuck.\n"
+    			+ "Usage:\n"
+    			+ "\tjava [-options] -jar Missandei.jar scriptFile [initialTapeLength]\n"
+    			+ "More information:\n"
+    			+ "\thttps://github.com/Gsllchb/Missandei");
+    }
+    
 	static char[] resize(final char[] source, final int head) {
 		assert head < 0 || head >= source.length;
 		final int length = source.length;
-		char[] arr = new char[length * 2];
+		char[] array = new char[length * 2];
 		if (head < 0) {
-			System.arraycopy(source, 0, arr, length, length);
+			System.arraycopy(source, 0, array, length, length);
 		} else {
-			System.arraycopy(source, 0, arr, 0, length);
+			System.arraycopy(source, 0, array, 0, length);
 		}
-		return arr;
+		return array;
 	}
 	 
-	static int matchedRightBracket(final CharSequence cs, final int begin) {
+	static int matchedRightBracket(final CharSequence sequence, final int leftBracketIndex) {
 		int flag = 1;
 		int i;
-		for (i = begin + 1; flag > 0; ++i) {
-			if (cs.charAt(i) == '[') {
+		for (i = leftBracketIndex + 1; flag > 0; ++i) {
+			if (sequence.charAt(i) == '[') {
 				++flag;
 				continue;
 			}
-			if (cs.charAt(i) == ']') {
+			if (sequence.charAt(i) == ']') {
 				--flag;
 			}
 		}
