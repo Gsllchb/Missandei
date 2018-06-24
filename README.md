@@ -1,5 +1,5 @@
 # Missandei
-A simple Java interpreter for Brainfuck
+A Java implementation of Brainfuck interpreter 
 
 ## Usage
 ```commandline
